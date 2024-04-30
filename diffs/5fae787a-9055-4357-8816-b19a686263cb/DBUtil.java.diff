@@ -22,8 +22,6 @@
  package com.ibm.security.appscan.altoromutual.util;
  
  import java.sql.Connection;
-@@ -22,0 +22,1 @@
-+import java.sql.PreparedStatement;
  import java.sql.DriverManager;
  import java.sql.ResultSet;
  import java.sql.SQLException;
@@ -41,6 +39,8 @@
  import com.ibm.security.appscan.altoromutual.model.Transaction;
  import com.ibm.security.appscan.altoromutual.model.User;
  import com.ibm.security.appscan.altoromutual.model.User.Role;
+@@ -39,0 +39,1 @@
++import java.sql.PreparedStatement;
  
  /**
   * Utility class for database operations
@@ -232,6 +232,8 @@
  	}
  	
  
+@@ -230,0 +231,1 @@
++
  	/**
  	 * Get user information
  	 * @param username
@@ -243,13 +245,14 @@
  			return null; 
  		
  		Connection connection = getConnection();
-@@ -241,2 +242,4 @@
+@@ -241,2 +243,5 @@
 -		Statement statement = connection.createStatement();
 -		ResultSet resultSet =statement.executeQuery("SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = '"+ username +"' "); /* BAD - user input should always be sanitized */
-+		PreparedStatement statement = connection
-+                .prepareStatement("SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = " + "?");
-+        statement.setString(1, username);
-+        ResultSet resultSet =statement.executeQuery(); /* BAD - user input should always be sanitized */
++		PreparedStatement preparedStatement = connection.prepareStatement(
++			"SELECT FIRST_NAME,LAST_NAME,ROLE FROM PEOPLE WHERE USER_ID = ?"
++		);
++		preparedStatement.setString(1, username);
++		ResultSet resultSet = preparedStatement.executeQuery();
  
  		String firstName = null;
  		String lastName = null;
@@ -262,6 +265,9 @@
  		
  		if (firstName == null || lastName == null)
  			return null;
+@@ -255,0 +260,2 @@
++
++
  		
  		User user = new User(username, firstName, lastName);
  		
