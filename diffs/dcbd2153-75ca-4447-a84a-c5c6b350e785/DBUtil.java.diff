@@ -22,8 +22,6 @@
  package com.ibm.security.appscan.altoromutual.util;
  
  import java.sql.Connection;
-@@ -22,0 +22,1 @@
-+import java.sql.PreparedStatement;
  import java.sql.DriverManager;
  import java.sql.ResultSet;
  import java.sql.SQLException;
@@ -41,6 +39,8 @@
  import com.ibm.security.appscan.altoromutual.model.Transaction;
  import com.ibm.security.appscan.altoromutual.model.User;
  import com.ibm.security.appscan.altoromutual.model.User.Role;
+@@ -39,0 +39,1 @@
++import java.sql.PreparedStatement;
  
  /**
   * Utility class for database operations
@@ -209,6 +209,8 @@
  	
  	/**
  	 * Authenticate user
+@@ -207,0 +208,1 @@
++
  	 * @param user user name
  	 * @param password password
  	 * @return true if valid user, false otherwise
@@ -219,16 +221,18 @@
  			return false; 
  		
  		Connection connection = getConnection();
-@@ -217,1 +218,4 @@
+@@ -217,1 +219,5 @@
 -		Statement statement = connection.createStatement();
-+		PreparedStatement statement = connection
-+                .prepareStatement("SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = '" + user + "' AND PASSWORD=" + "?");
-+        statement.setString(1, password);
-+        ResultSet resultSet =statement.executeQuery(); /* BAD - user input should always be sanitized */
++		PreparedStatement preparedStatement = connection.prepareStatement(
++			"SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = ? AND PASSWORD = ?"
++		);
++		preparedStatement.setString(1, user);
++		preparedStatement.setString(2, password);
  		
-@@ -219,2 +223,0 @@
+@@ -219,1 +225,1 @@
 -		ResultSet resultSet =statement.executeQuery("SELECT COUNT(*)FROM PEOPLE WHERE USER_ID = '"+ user +"' AND PASSWORD='" + password + "'"); /* BAD - user input should always be sanitized */
--		
++		ResultSet resultSet = preparedStatement.executeQuery();
+ 		
  		if (resultSet.next()){
  			
  				if (resultSet.getInt(1) > 0)
@@ -240,6 +244,9 @@
  
  	/**
  	 * Get user information
+@@ -232,0 +238,2 @@
++
++
  	 * @param username
  	 * @return user information
  	 * @throws SQLException
