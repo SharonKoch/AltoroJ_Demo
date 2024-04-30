@@ -22,8 +22,6 @@
  package com.ibm.security.appscan.altoromutual.util;
  
  import java.sql.Connection;
-@@ -22,0 +22,1 @@
-+import java.sql.PreparedStatement;
  import java.sql.DriverManager;
  import java.sql.ResultSet;
  import java.sql.SQLException;
@@ -41,6 +39,8 @@
  import com.ibm.security.appscan.altoromutual.model.Transaction;
  import com.ibm.security.appscan.altoromutual.model.User;
  import com.ibm.security.appscan.altoromutual.model.User.Role;
+@@ -39,0 +39,1 @@
++import java.sql.PreparedStatement;
  
  /**
   * Utility class for database operations
@@ -484,7 +484,17 @@
  		try {
  			Connection connection = getConnection();
  			Statement statement = connection.createStatement();
- 			statement.execute("INSERT INTO SPECIAL_CUSTOMERS (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('"+username+"','"+password+"', '"+firstname+"', '"+lastname+"','user')");
+@@ -482,1 +483,9 @@
+-			statement.execute("INSERT INTO SPECIAL_CUSTOMERS (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('"+username+"','"+password+"', '"+firstname+"', '"+lastname+"','user')");
++
++			PreparedStatement preparedStatement = connection.prepareStatement(
++				"INSERT INTO SPECIAL_CUSTOMERS (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES (?, ?, ?, ?, 'user')"
++			);
++			preparedStatement.setString(1, username);
++			preparedStatement.setString(2, password);
++			preparedStatement.setString(3, firstname);
++			preparedStatement.setString(4, lastname);
++			preparedStatement.executeUpdate();
  			return null;
  		} catch (SQLException e){
  			return e.toString();
@@ -495,14 +505,17 @@
  	public static String addUser(String username, String password, String firstname, String lastname) {
  		try {
  			Connection connection = getConnection();
-@@ -493,2 +494,5 @@
+@@ -493,2 +502,8 @@
 -			Statement statement = connection.createStatement();
 -			statement.execute("INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES ('"+username+"','"+password+"', '"+firstname+"', '"+lastname+"','user')");
-+			PreparedStatement statement = connection
-+					.prepareStatement("INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES (" + "?"
-+							+ ",'" + password + "', '" + firstname + "', '" + lastname + "','user')");
-+			statement.setString(1, username);
-+			statement.execute();
++			PreparedStatement preparedStatement = connection.prepareStatement(
++				"INSERT INTO PEOPLE (USER_ID,PASSWORD,FIRST_NAME,LAST_NAME,ROLE) VALUES (?, ?, ?, ?, 'user')"
++			);
++			preparedStatement.setString(1, username);
++			preparedStatement.setString(2, password);
++			preparedStatement.setString(3, firstname);
++			preparedStatement.setString(4, lastname);
++			preparedStatement.executeUpdate();
  			return null;
  		} catch (SQLException e){
  			return e.toString();
@@ -513,8 +526,17 @@
  	public static String changePassword(String username, String password) {
  		try {
  			Connection connection = getConnection();
- 			Statement statement = connection.createStatement();
- 			statement.execute("UPDATE PEOPLE SET PASSWORD = '"+ password +"' WHERE USER_ID = '"+username+"'");
+@@ -505,2 +520,8 @@
+-			Statement statement = connection.createStatement();
+-			statement.execute("UPDATE PEOPLE SET PASSWORD = '"+ password +"' WHERE USER_ID = '"+username+"'");
++			PreparedStatement preparedStatement = connection.prepareStatement(
++				"UPDATE PEOPLE SET PASSWORD = ? WHERE USER_ID = ?"
++			);
++			preparedStatement.setString(1, password);
++			preparedStatement.setString(2, username);
++			preparedStatement.executeUpdate();
++
++
  			return null;
  		} catch (SQLException e){
  			return e.toString();
